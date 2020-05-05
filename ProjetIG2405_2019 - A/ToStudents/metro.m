@@ -15,6 +15,7 @@ function [fileOut,resizeFactor] = metro(type)
 % Sélectionner les images en fonction de la base de données, apprentissage ou test
 
 n = 1:261;
+ok = 1;
 if strcmp(type,'Test')
     numImages  = n(find(mod(n,3)));
 elseif strcmp(type,'Learn')
@@ -27,15 +28,22 @@ end
 
 if ok
     % Definir le facteur de redimensionnement
-    resizeFactor =  -- COMPLETER
+    resizeFactor =  2;
     
     % Programme de reconnaissance des images
     for n = numImages
-
+        % On récupère l'image
+        im = imread(sprintf('BD/IM (%d).jpg',n));
         
-        -- RECONNAISSANCE DES SYMBOLES DANS L'IMAGE n
+        %segmentation -- trouver les cercles avec imfindcircles --%
+        [centers,radius] = imfindcircles(im,[25 120],'ObjectPolarity','dark', ... 
+            'Sensitivity',0.92,'EdgeThreshold',0.082);
         
-        -- STOCAGE DANS LA MATRICE BD de 6 colonnes
+        imshow(im)
+        title("Image "+ n + " ");
+        h = viscircles(centers,radius);
+        pause(0.1);
+        
     end
     
     % Sauvegarde dans un fichier .mat des résulatts
