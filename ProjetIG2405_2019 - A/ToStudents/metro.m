@@ -15,6 +15,7 @@ function [fileOut,resizeFactor] = metro(type)
 % Sélectionner les images en fonction de la base de données, apprentissage ou test
 
 n = 1:261;
+ok = 1;
 if strcmp(type,'Test')
     numImages  = n(find(mod(n,3)));
 elseif strcmp(type,'Learn')
@@ -27,15 +28,37 @@ end
 
 if ok
     % Definir le facteur de redimensionnement
-    resizeFactor =  -- COMPLETER
+    resizeFactor = 2;
     
     % Programme de reconnaissance des images
-    for n = numImages
-
+    for n = numImages   % n= numéro de l'image%
         
-        -- RECONNAISSANCE DES SYMBOLES DANS L'IMAGE n
+        % On récupère l'image
+        im = imread(sprintf('BD/IM (%d).jpg',n));
         
-        -- STOCAGE DANS LA MATRICE BD de 6 colonnes
+        %compresse le nb de pixel pour trouver les cercles 
+%         [rows, columns, numColorChannels] = size(im);
+%         numOutputRows = round(rows/resizeFactor);
+%         numOutputColumns = round(columns/resizeFactor);
+%         imgResize = imresize(im, [numOutputRows, numOutputColumns]);
+        %imgResize = imresize(im, 0.8, 'nearest');
+        
+        %segmentation -- trouver les cercles avec imfindcircles --%
+        [centers,radius] = imfindcircles(im,[25 120],'ObjectPolarity','dark', ... 
+            'Sensitivity',0.85,'EdgeThreshold',0.1 ,'Method','twostage');
+%         [centersBright,radiiBright,metricBright] = imfindcircles(imgResize,[20 180], ...
+%     'ObjectPolarity','bright','Sensitivity',0.8,'EdgeThreshold',0.1);
+        
+        imshow(im)
+        title("Image"+ n + " ");
+        h = viscircles(centers,radius);
+        %hBright = viscircles(centersBright, radiiBright,'Color','b');
+        pause(1);
+        
+        % voir si c'est bien une ligne
+        %-- RECONNAISSANCE DES SYMBOLES DANS L'IMAGE n
+        
+        %-- STOCAGE DANS LA MATRICE BD de 6 colonnes
     end
     
     % Sauvegarde dans un fichier .mat des résulatts
