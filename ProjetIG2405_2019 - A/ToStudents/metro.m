@@ -28,21 +28,28 @@ end
 
 if ok
     % Definir le facteur de redimensionnement
-    resizeFactor =  2;
+resizeFactor = 2.2;
     
     % Programme de reconnaissance des images
-    for n = numImages
-        % On récupère l'image
+    for n = 261   % n= numéro de l'image%
+        
+       % On récupère l'image
         im = imread(sprintf('BD/IM (%d).jpg',n));
         
-        %segmentation -- trouver les cercles avec imfindcircles --%
-        [centers,radius] = imfindcircles(im,[25 120],'ObjectPolarity','dark', ... 
-            'Sensitivity',0.92,'EdgeThreshold',0.082);
+        %compresse le nb de pixel pour trouver les cercles 
+        [rows, columns, numColorChannels] = size(im);
+        numOutputRows = round(rows/resizeFactor);
+        numOutputColumns = round(columns/resizeFactor);
+        imgResize = imresize(im, [numOutputRows, numOutputColumns]);
         
-        imshow(im)
+        %segmentation -- trouver les cercles avec imfindcircles --%
+       [centers,radius] = imfindcircles(imgResize,[8 80],'ObjectPolarity','dark', ... 
+            'Sensitivity',0.855,'EdgeThreshold',0.1);
+        
+        imshow(imgResize)
         title("Image "+ n + " ");
         h = viscircles(centers,radius);
-        pause(0.1);
+        pause(1);
         
     end
     
