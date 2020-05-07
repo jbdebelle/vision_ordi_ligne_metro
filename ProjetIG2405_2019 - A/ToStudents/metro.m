@@ -31,7 +31,7 @@ if ok
 resizeFactor = 2.2;
     
     % Programme de reconnaissance des images
-    for n = 261   % n= numéro de l'image%
+    for n = numImages   % n= numéro de l'image%
         
        % On récupère l'image
         im = imread(sprintf('BD/IM (%d).jpg',n));
