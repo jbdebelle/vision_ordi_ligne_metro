@@ -41,10 +41,12 @@ resizeFactor = 2.2;
         numOutputRows = round(rows/resizeFactor);
         numOutputColumns = round(columns/resizeFactor);
         imgResize = imresize(im, [numOutputRows, numOutputColumns]);
+        %imgResize = rgb2gray(imgResize);
         
         %segmentation -- trouver les cercles avec imfindcircles --%
        [centers,radius] = imfindcircles(imgResize,[8 80],'ObjectPolarity','dark', ... 
-            'Sensitivity',0.855,'EdgeThreshold',0.1);
+            'Sensitivity',0.80,'EdgeThreshold',0.05);
+        
         
         imshow(imgResize)
         title("Image "+ n + " ");
