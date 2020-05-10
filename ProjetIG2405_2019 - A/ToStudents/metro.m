@@ -9,7 +9,10 @@
 %                           aux images
 % 
 %--------------------------------------------------------------------------
+
+
 function [fileOut,resizeFactor] = metro(type)
+close all;
 
 
 % Sélectionner les images en fonction de la base de données, apprentissage ou test
@@ -18,8 +21,10 @@ n = 1:261;
 ok = 1;
 if strcmp(type,'Test')
     numImages  = n(find(mod(n,3)));
+    
 elseif strcmp(type,'Learn')
     numImages  = n(find(~mod(n,3)));
+    
 else
     ok = 0;
     uiwait(errordlg('Bad identifier (should be ''Learn'' or ''Test'' ','ERRORDLG'));
@@ -28,35 +33,130 @@ end
 
 if ok
     % Definir le facteur de redimensionnement
-resizeFactor = 2.2;
-    
+
+    resizeFactor = 2.2;
+    BD= [];
     % Programme de reconnaissance des images
-    for n = numImages   % n= numéro de l'image%
-        
+   %r figure;
+  %r  for n = numImages
+    for n = 1:10
        % On récupère l'image
+        disp("On traite imag "+n+"");
         im = imread(sprintf('BD/IM (%d).jpg',n));
         
+        %patie alex resize and circle 
         %compresse le nb de pixel pour trouver les cercles 
         [rows, columns, numColorChannels] = size(im);
         numOutputRows = round(rows/resizeFactor);
         numOutputColumns = round(columns/resizeFactor);
-        imgResize = imresize(im, [numOutputRows, numOutputColumns]);
+        im = imresize(im, [numOutputRows, numOutputColumns]);
         %imgResize = rgb2gray(imgResize);
         
         %segmentation -- trouver les cercles avec imfindcircles --%
-       [centers,radius] = imfindcircles(imgResize,[8 80],'ObjectPolarity','dark', ... 
+       [centers,radius] = imfindcircles(im,[8 80],'ObjectPolarity','dark', ... 
             'Sensitivity',0.80,'EdgeThreshold',0.05);
+        %fin partie alex
+        
+     
+%         disp(size(im));
+%         disp(centers);
+%         disp(centers(2,1));
+%         disp(centers(2,2));
+%         
+%         disp(radius);
+%         disp('test');
+%         disp(radius(2,1));
+    %r    imshow(im)
+     %r   title("Image "+ n + " ");
+        
+     %r   h = viscircles(centers,radius);
+        
+        pic= [01 02 03 04 05 06 07 08 09 10 11 12 13 14];
+        im = rgb2gray(im);
+
         
         
-        imshow(imgResize)
-        title("Image "+ n + " ");
-        h = viscircles(centers,radius);
-        pause(1);
         
+       
+
+        
+       %r figure;
+        for m = 1: length(radius)
+            disp("On traite le cercle "+m+"");
+            maLignetrouve = [];
+%             disp(length(radius));
+%             disp(1: length(radius))
+%             disp(centers(m,2)-radius(m,1));
+%             disp(centers(m,2)+radius(m,1));
+%             disp(centers(m,1)-radius(m,1));
+%             disp(centers(m,1)+radius(m,1));
+            
+            im2=im( centers(m,2)-radius(m,1):centers(m,2)+radius(m,1),centers(m,1)-radius(m,1):centers(m,1)+radius(m,1));
+            
+           %r imshow(im2);
+            level = graythresh(im2);
+            BW = imbinarize(im2,level);
+            
+          
+         %r   figure;
+          %r  figure;
+            for elem = pic
+                disp("On traite la ligne de metro "+elem+"");
+                impan= [];
+                if elem<10
+                    impan = imread(sprintf('PICTO/0%d.png',elem));
+                    [centerspan,radiuspan] = imfindcircles(impan,[20 120],'ObjectPolarity','dark', ... 
+                    'Sensitivity',0.92,'EdgeThreshold',0.082); 
+                    impan=impan(centerspan(1,2)-radiuspan(1):centerspan(1,2)+radiuspan(1),centerspan(1,1)-radiuspan(1):centerspan(1,1)+radiuspan(1));
+                    %impan=rgb2gray(impan);
+                    level = graythresh(impan);
+                    if elem==6 
+                       level=level-0.4; 
+                    end    
+                    BWpan = double(imbinarize(impan,level));
+                    
+                   
+                else
+                    impan = imread(sprintf('PICTO/%d.png',elem));
+                    [centerspan,radiuspan] = imfindcircles(impan,[20 120],'ObjectPolarity','dark', ... 
+                    'Sensitivity',0.92,'EdgeThreshold',0.082); 
+                    impan=impan(centerspan(1,2)-radiuspan(1):centerspan(1,2)+radiuspan(1),centerspan(1,1)-radiuspan(1):centerspan(1,1)+radiuspan(1));
+                   % impan=rgb2gray(impan);
+                    level = graythresh(impan);
+                    if elem==13
+                       level=level-0.4;  
+                    end    
+                    BWpan = double(imbinarize(impan,level));
+                    
+                end
+                
+                BW = double(imresize(BW,size(BWpan)));
+               %r imshowpair(BW,BWpan,'montage');
+              %r  title("On compare image recuperer du metro et celle des ligne de metro BDD (iteration ligne par ligne)");
+                [ssimval, ssimmap]  = ssim(BW, BWpan);
+                
+             %r   imshow(ssimmap,[]);
+             %r   title(['Local SSIM Map with Global SSIM Value: ',num2str(ssimval)]);
+                if ssimval> 0.5
+                    maLignetrouve = [n centers(n,2)-radius(n) centers(n,2)+radius(n) centers(n,1)-radius(n) centers(n,1)+radius(n) elem];
+                    BD = [BD;maLignetrouve];
+                    disp('Nous avons trouver un match avce la ligne de metro');
+                   
+                end                 
+                
+               
+                 
+            end
+
+
+         
+
+        end    
+
     end
-    
-    % Sauvegarde dans un fichier .mat des résulatts
-    fileOut  = 'myResuts.mat';
-    save(fileOut,'BD');
-    
+%Sauvegarde dans un fichier .mat des résulatts
+
+  fileOut  = ('myResuts.mat');
+  save(fileOut,'BD');  
 end
+
