@@ -39,7 +39,7 @@ if ok
     % Programme de reconnaissance des images
    %r figure;
   %r  for n = numImages
-    for n = 1:10
+    for n = 1:3
        % On récupère l'image
         disp("On traite imag "+n+"");
         im = imread(sprintf('BD/IM (%d).jpg',n));
@@ -141,7 +141,7 @@ if ok
             disp(matricedesimilitude);
             if maxssimval> 0.4
                     
-                    maLignetrouve = [n resizeFactor*centers(n,2)-resizeFactor*radius(n) resizeFactor*centers(n,2)+resizeFactor*radius(n) resizeFactor*centers(n,1)-resizeFactor*radius(n) resizeFactor*centers(n,1)+resizeFactor*radius(n) indexssimval];
+                    maLignetrouve = [n floor(resizeFactor*centers(n,2)-resizeFactor*radius(n)) floor(resizeFactor*centers(n,2)+resizeFactor*radius(n)) floor(resizeFactor*centers(n,1)-resizeFactor*radius(n)) floor(resizeFactor*centers(n,1)+resizeFactor*radius(n)) indexssimval];
 
                     BD = [BD;maLignetrouve];
                     disp('Nous avons trouver un match avce la ligne de metro');
