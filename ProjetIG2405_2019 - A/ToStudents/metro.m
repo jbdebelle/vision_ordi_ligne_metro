@@ -74,12 +74,6 @@ if ok
         pic= [01 02 03 04 05 06 07 08 09 10 11 12 13 14];
         im = rgb2gray(im);
 
-        
-        
-        
-       
-
-        
        %r figure;
         for m = 1: length(radius)
             disp("On traite le cercle "+m+"");
@@ -90,8 +84,11 @@ if ok
 %             disp(centers(m,2)+radius(m,1));
 %             disp(centers(m,1)-radius(m,1));
 %             disp(centers(m,1)+radius(m,1));
-            
-            im2=im( centers(m,2)-radius(m,1):centers(m,2)+radius(m,1),centers(m,1)-radius(m,1):centers(m,1)+radius(m,1));
+            try
+                im2=im( centers(m,2)-radius(m,1):centers(m,2)+radius(m,1),centers(m,1)-radius(m,1):centers(m,1)+radius(m,1));
+            catch ME
+                break;
+            end
             
            %r imshow(im2);
             level = graythresh(im2);
@@ -138,18 +135,12 @@ if ok
              %r   imshow(ssimmap,[]);
              %r   title(['Local SSIM Map with Global SSIM Value: ',num2str(ssimval)]);
                 if ssimval> 0.5
-                    maLignetrouve = [n centers(n,2)-radius(n) centers(n,2)+radius(n) centers(n,1)-radius(n) centers(n,1)+radius(n) elem];
+                    maLignetrouve = [n resizeFactor*centers(n,2)-resizeFactor*radius(n) resizeFactor*centers(n,2)+resizeFactor*radius(n) resizeFactor*centers(n,1)-resizeFactor*radius(n) resizeFactor*centers(n,1)+resizeFactor*radius(n) elem];
                     BD = [BD;maLignetrouve];
                     disp('Nous avons trouver un match avce la ligne de metro');
                    
-                end                 
-                
-               
-                 
+                end                        
             end
-
-
-         
 
         end    
 
