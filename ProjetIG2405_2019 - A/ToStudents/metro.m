@@ -132,14 +132,14 @@ if ok
                %r imshowpair(BW,BWpan,'montage');
               %r  title("On compare image recuperer du metro et celle des ligne de metro BDD (iteration ligne par ligne)");
                 [ssimval, ssimmap]  = ssim(BW, BWpan);
-                matricedesimilitude= [matricedesimilitude;ssimval],
+                matricedesimilitude= [matricedesimilitude;ssimval];
              %r   imshow(ssimmap,[]);
              %r   title(['Local SSIM Map with Global SSIM Value: ',num2str(ssimval)]);
                                         
             end
             [maxssimval,indexssimval]= max(matricedesimilitude);
-           
-            if maxssimval> 0.5
+            disp(matricedesimilitude);
+            if maxssimval> 0.4
                     
                     maLignetrouve = [n resizeFactor*centers(n,2)-resizeFactor*radius(n) resizeFactor*centers(n,2)+resizeFactor*radius(n) resizeFactor*centers(n,1)-resizeFactor*radius(n) resizeFactor*centers(n,1)+resizeFactor*radius(n) indexssimval];
 
