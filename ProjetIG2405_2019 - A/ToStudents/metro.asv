@@ -33,14 +33,29 @@ end
 
 if ok
     % Definir le facteur de redimensionnement
-    resizeFactor =  2;
+
+    resizeFactor = 2.2;
     BD= [];
     % Programme de reconnaissance des images
-    figure;
-    for n = numImages
+   %r figure;
+  %r  for n = numImages
+    for n = 1:10
        % On récupère l'image
         disp("On traite imag "+n+"");
         im = imread(sprintf('BD/IM (%d).jpg',n));
+        
+        %patie alex
+        %compresse le nb de pixel pour trouver les cercles 
+        [rows, columns, numColorChannels] = size(im);
+        numOutputRows = round(rows/resizeFactor);
+        numOutputColumns = round(columns/resizeFactor);
+        im = imresize(im, [numOutputRows, numOutputColumns]);
+        %imgResize = rgb2gray(imgResize);
+        
+        %segmentation -- trouver les cercles avec imfindcircles --%
+       [centers,radius] = imfindcircles(im,[8 80],'ObjectPolarity','dark', ... 
+            'Sensitivity',0.80,'EdgeThreshold',0.05);
+        %fin partie alex
         
       %  segmentation -- trouver les cercles avec imfindcircles --%
         [centers,radius] = imfindcircles(im,[25 120],'ObjectPolarity','dark', ... 
@@ -53,34 +68,40 @@ if ok
 %         disp(radius);
 %         disp('test');
 %         disp(radius(2,1));
-        imshow(im)
-        title("Image "+ n + " ");
+    %r    imshow(im)
+     %r   title("Image "+ n + " ");
         
-        h = viscircles(centers,radius);
+     %r   h = viscircles(centers,radius);
         
         pic= [01 02 03 04 05 06 07 08 09 10 11 12 13 14];
         im = rgb2gray(im);
+
         
         
+        
+       
+
+        
+       %r figure;
         for m = 1: length(radius)
             disp("On traite le cercle "+m+"");
             maLignetrouve = [];
-            disp(length(radius));
-            disp(1: length(radius))
-            disp(centers(m,2)-radius(m,1));
-            disp(centers(m,2)+radius(m,1));
-            disp(centers(m,1)-radius(m,1));
-            disp(centers(m,1)+radius(m,1));
+%             disp(length(radius));
+%             disp(1: length(radius))
+%             disp(centers(m,2)-radius(m,1));
+%             disp(centers(m,2)+radius(m,1));
+%             disp(centers(m,1)-radius(m,1));
+%             disp(centers(m,1)+radius(m,1));
             
             im2=im( centers(m,2)-radius(m,1):centers(m,2)+radius(m,1),centers(m,1)-radius(m,1):centers(m,1)+radius(m,1));
-            figure;
-            imshow(im2);
+            
+           %r imshow(im2);
             level = graythresh(im2);
             BW = imbinarize(im2,level);
             
           
-            
-            figure;
+         %r   figure;
+          %r  figure;
             for elem = pic
                 disp("On traite la ligne de metro "+elem+"");
                 impan= [];
@@ -112,19 +133,19 @@ if ok
                 end
                 
                 BW = double(imresize(BW,size(BWpan)));
-                imshowpair(BW,BWpan,'montage');
-                title("On compare image recuperer du metro et celle des ligne de metro BDD (iteration ligne par ligne)");
+               %r imshowpair(BW,BWpan,'montage');
+              %r  title("On compare image recuperer du metro et celle des ligne de metro BDD (iteration ligne par ligne)");
                 [ssimval, ssimmap]  = ssim(BW, BWpan);
-                figure;
-                imshow(ssimmap,[]);
-                title(['Local SSIM Map with Global SSIM Value: ',num2str(ssimval)]);
+                
+             %r   imshow(ssimmap,[]);
+             %r   title(['Local SSIM Map with Global SSIM Value: ',num2str(ssimval)]);
                 if ssimval> 0.5
-                    %maLignetrouve = [n centers(n,2)-radius(n) centers(n,2)+radius(n) centers(n,1)-radius(n) centers(n,1)+radius(n) elem];
-                    %BD = [BD;maLignetrouve];
+                    maLignetrouve = [n centers(n,2)-radius(n) centers(n,2)+radius(n) centers(n,1)-radius(n) centers(n,1)+radius(n) elem];
+                    BD = [BD;maLignetrouve];
                     disp('Nous avons trouver un match avce la ligne de metro');
-                    %disp(BD);
+                   
                 end                 
-                pause 
+                
                
                  
             end

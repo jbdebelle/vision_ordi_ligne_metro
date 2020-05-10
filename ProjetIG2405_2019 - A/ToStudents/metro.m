@@ -33,7 +33,8 @@ end
 
 if ok
     % Definir le facteur de redimensionnement
-    resizeFactor =  2;
+
+    resizeFactor = 2.2;
     BD= [];
     % Programme de reconnaissance des images
    %r figure;
@@ -43,9 +44,20 @@ if ok
         disp("On traite imag "+n+"");
         im = imread(sprintf('BD/IM (%d).jpg',n));
         
-      %  segmentation -- trouver les cercles avec imfindcircles --%
-        [centers,radius] = imfindcircles(im,[25 120],'ObjectPolarity','dark', ... 
-            'Sensitivity',0.92,'EdgeThreshold',0.082);
+        %patie alex resize and circle 
+        %compresse le nb de pixel pour trouver les cercles 
+        [rows, columns, numColorChannels] = size(im);
+        numOutputRows = round(rows/resizeFactor);
+        numOutputColumns = round(columns/resizeFactor);
+        im = imresize(im, [numOutputRows, numOutputColumns]);
+        %imgResize = rgb2gray(imgResize);
+        
+        %segmentation -- trouver les cercles avec imfindcircles --%
+       [centers,radius] = imfindcircles(im,[8 80],'ObjectPolarity','dark', ... 
+            'Sensitivity',0.80,'EdgeThreshold',0.05);
+        %fin partie alex
+        
+     
 %         disp(size(im));
 %         disp(centers);
 %         disp(centers(2,1));
@@ -61,6 +73,12 @@ if ok
         
         pic= [01 02 03 04 05 06 07 08 09 10 11 12 13 14];
         im = rgb2gray(im);
+
+        
+        
+        
+       
+
         
        %r figure;
         for m = 1: length(radius)
