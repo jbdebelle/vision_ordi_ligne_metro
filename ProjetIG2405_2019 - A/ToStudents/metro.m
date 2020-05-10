@@ -66,10 +66,10 @@ if ok
 %         disp(radius);
 %         disp('test');
 %         disp(radius(2,1));
-    %r    imshow(im)
-     %r   title("Image "+ n + " ");
+        imshow(im)
+        title("Image "+ n + " ");
         
-     %r   h = viscircles(centers,radius);
+        h = viscircles(centers,radius);
         
         pic= [01 02 03 04 05 06 07 08 09 10 11 12 13 14];
         im = rgb2gray(im);
@@ -138,7 +138,7 @@ if ok
              %r   imshow(ssimmap,[]);
              %r   title(['Local SSIM Map with Global SSIM Value: ',num2str(ssimval)]);
                 if ssimval> 0.5
-                    maLignetrouve = [n centers(n,2)-radius(n) centers(n,2)+radius(n) centers(n,1)-radius(n) centers(n,1)+radius(n) elem];
+                    maLignetrouve = [n (centers(n,2)-radius(n))*resizeFactor (centers(n,2)+radius(n))*resizeFactor (centers(n,1)-radius(n))*resizeFactor (centers(n,1)+radius(n))*resizeFactor elem];
                     BD = [BD;maLignetrouve];
                     disp('Nous avons trouver un match avce la ligne de metro');
                    
