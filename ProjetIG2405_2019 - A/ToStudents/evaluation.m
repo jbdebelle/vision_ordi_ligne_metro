@@ -90,7 +90,7 @@ end
 % la base de test: ce sont les symboles en moins
 ind  = find(processed == 0);
 for p = 1:length(ind)
-    minusVector(BDTEST(ind(p),6))   = minusVector(BDTEST(ind(p),6)) + 1;
+    minusVector(BDREF(ind(p),6))   = minusVector(BDREF(ind(p),6)) + 1;
 end
 
 
