@@ -17,13 +17,13 @@ close all;
 
 % Sélectionner les images en fonction de la base de données, apprentissage ou test
 
-n = 1:261;
+z = 1:261;
 ok = 1;
 if strcmp(type,'Test')
-    numImages  = n(find(mod(n,3)));
+    numImages  = z(find(mod(z,3)));
     
 elseif strcmp(type,'Learn')
-    numImages  = n(find(~mod(n,3)));
+    numImages  = z(find(~mod(z,3)));
     
 else
     ok = 0;
@@ -34,12 +34,11 @@ end
 if ok
     % Definir le facteur de redimensionnement
 
-    resizeFactor = 2.2;
+    resizeFactor = 2;
     BD= [];
     % Programme de reconnaissance des images
-   %r figure;
   %r  for n = numImages
-    for n = 1:3
+    for n = numImages
        % On récupère l'image
         disp("On traite imag "+n+"");
         im = imread(sprintf('BD/IM (%d).jpg',n));
@@ -54,20 +53,10 @@ if ok
         
         %segmentation -- trouver les cercles avec imfindcircles --%
        [centers,radius] = imfindcircles(im,[8 80],'ObjectPolarity','dark', ... 
-            'Sensitivity',0.81,'EdgeThreshold',0.05);
-        %fin partie alex
-        
-     
-%         disp(size(im));
-%         disp(centers);
-%         disp(centers(2,1));
-%         disp(centers(2,2));
-%         
-%         disp(radius);
-%         disp('test');
-%         disp(radius(2,1));
-        imshow(im)
-        title("Image "+ n + " ");
+            'Sensitivity',0.818,'EdgeThreshold',0.07);
+
+%         imshow(im)
+%         title("Image "+ n + " ");
         
         h = viscircles(centers,radius);
         
@@ -78,12 +67,6 @@ if ok
         for m = 1: length(radius)
             disp("On traite le cercle "+m+"");
             maLignetrouve = [];
-%             disp(length(radius));
-%             disp(1: length(radius))
-%             disp(centers(m,2)-radius(m,1));
-%             disp(centers(m,2)+radius(m,1));
-%             disp(centers(m,1)-radius(m,1));
-%             disp(centers(m,1)+radius(m,1));
             try
                 im2=im( centers(m,2)-radius(m,1):centers(m,2)+radius(m,1),centers(m,1)-radius(m,1):centers(m,1)+radius(m,1));
             catch ME
@@ -94,9 +77,6 @@ if ok
             level = graythresh(im2);
             BW = imbinarize(im2,level);
             
-          
-         %r   figure;
-          %r  figure;
             matricedesimilitude = [];
             for elem = pic
                 disp("On traite la ligne de metro "+elem+"");
@@ -141,8 +121,7 @@ if ok
             disp(matricedesimilitude);
             if maxssimval> 0.4
                     
-                    maLignetrouve = [n floor(resizeFactor*centers(n,2)-resizeFactor*radius(n)) floor(resizeFactor*centers(n,2)+resizeFactor*radius(n)) floor(resizeFactor*centers(n,1)-resizeFactor*radius(n)) floor(resizeFactor*centers(n,1)+resizeFactor*radius(n)) indexssimval];
-
+                    maLignetrouve = [n floor(resizeFactor*centers(m,2)-resizeFactor*radius(m)) floor(resizeFactor*centers(m,2)+resizeFactor*radius(m)) floor(resizeFactor*centers(m,1)-resizeFactor*radius(m)) floor(resizeFactor*centers(m,1)+resizeFactor*radius(m)) indexssimval];
                     BD = [BD;maLignetrouve];
                     disp('Nous avons trouver un match avce la ligne de metro');
                    
@@ -153,7 +132,7 @@ if ok
     end
 %Sauvegarde dans un fichier .mat des résulatts
 
-  fileOut  = ('myResuts.mat');
+  fileOut  = ('myResults.mat');
   save(fileOut,'BD');  
 end
 
