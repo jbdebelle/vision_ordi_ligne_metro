@@ -135,10 +135,10 @@ if ok
                     BWpan = double(imbinarize(impan,level));
                     
                 end
-                [ROWS, COLS, map]=size(impan2);
+                [ROWS, COLS, map]=size(impan);
                 %disp(ROWS);
                 %disp(COLS);
-                im3 = imresize(im3, [ROWS COLS]);
+                im2 = imresize(im2, [ROWS COLS]);
                  
                 %figure;
                 %imshow(im2);
@@ -152,16 +152,14 @@ if ok
              %r   imshow(ssimmap,[]);
              %r   title(['Local SSIM Map with Global SSIM Value: ',num2str(ssimval)]);
                 
-                c1 = corr2(impan2(:,:,1),im3(:,:,1));
-                c2 = corr2(impan2(:,:,2),im3(:,:,2));
-                c3 = corr2(impan2(:,:,3),im3(:,:,3));
-                [max_c1, imax] = max(abs(c1(:)));
-                [max_c2, imax] = max(abs(c2(:)));
-                [max_c3, imax] = max(abs(c3(:)));
-                %disp("La correlation pour cette image et la ligne de metro")
-               
-                
-                corr = max_c1 + max_c2 + max_c3;
+%                 c1 = corr2(impan2(:,:,1),im3(:,:,1));
+%                 c2 = corr2(impan2(:,:,2),im3(:,:,2));
+%                 c3 = corr2(impan2(:,:,3),im3(:,:,3));
+%                 [max_c1, imax] = max(abs(c1(:)));
+%                 [max_c2, imax] = max(abs(c2(:)));
+%                 [max_c3, imax] = max(abs(c3(:)));
+%                 maxs = [max_c1 max_c2 max_c3];
+                corr = corr2(impan,im2);
                 
                 matricecorrelation= [matricecorrelation ; corr];
                                         
@@ -173,7 +171,7 @@ if ok
             
             disp("la valeur max pour cette image est : "+maxssimval+ "pour la ligne   "+ indexssimval+ " ");
             
-            if maxssimval> 3
+            if maxssimval> 1
                     
                     maLignetrouve = [n floor(resizeFactor*centers(m,2)-resizeFactor*radius(m)) floor(resizeFactor*centers(m,2)+resizeFactor*radius(m)) floor(resizeFactor*centers(m,1)-resizeFactor*radius(m)) floor(resizeFactor*centers(m,1)+resizeFactor*radius(m)) indexssimval];
                     BD = [BD;maLignetrouve];
