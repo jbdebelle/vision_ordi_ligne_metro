@@ -135,10 +135,10 @@ if ok
                     BWpan = double(imbinarize(impan,level));
                     
                 end
-                [ROWS, COLS, map]=size(impan2);
+                [ROWS, COLS, map]=size(impan);
                 %disp(ROWS);
                 %disp(COLS);
-                im3 = imresize(im3, [ROWS COLS]);
+                im2 = imresize(im2, [ROWS COLS]);
                  
                 %figure;
                 %imshow(im2);
@@ -158,10 +158,8 @@ if ok
                 [max_c1, imax] = max(abs(c1(:)));
                 [max_c2, imax] = max(abs(c2(:)));
                 [max_c3, imax] = max(abs(c3(:)));
-                %disp("La correlation pour cette image et la ligne de metro")
-               
                 
-                corr = max_c1 + max_c2 + max_c3;
+                corr = max_c1+ max_c2 +max_c3;
                 
                 matricecorrelation= [matricecorrelation ; corr];
                                         
@@ -173,7 +171,9 @@ if ok
             
             disp("la valeur max pour cette image est : "+maxssimval+ "pour la ligne   "+ indexssimval+ " ");
             
+
             if maxssimval> 2.5
+
                     
                     maLignetrouve = [n floor(resizeFactor*centers(m,2)-resizeFactor*radius(m)) floor(resizeFactor*centers(m,2)+resizeFactor*radius(m)) floor(resizeFactor*centers(m,1)-resizeFactor*radius(m)) floor(resizeFactor*centers(m,1)+resizeFactor*radius(m)) indexssimval];
                     BD = [BD;maLignetrouve];
