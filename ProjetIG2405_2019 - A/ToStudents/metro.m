@@ -39,7 +39,7 @@ if ok
     % Programme de reconnaissance des images
   %r  for n = numImages
     for n = numImages
-   % for n= 1
+    %for n= 1:10
        % On récupère l'image
         disp("On traite imag "+n+"");
         imo = imread(sprintf('BD/IM (%d).jpg',n));
@@ -56,10 +56,10 @@ if ok
        [centers,radius] = imfindcircles(im,[8 80],'ObjectPolarity','dark', ... 
             'Sensitivity',0.818,'EdgeThreshold',0.07);
 
-%         imshow(im)
-%         title("Image "+ n + " ");
+         %imshow(im)
+         %title("Image "+ n + " ");
         
-      %  h = viscircles(centers,radius);
+        h = viscircles(centers,radius);
         
         pic= [01 02 03 04 05 06 07 08 09 10 11 12 13 14];
         im = rgb2gray(im);
@@ -78,9 +78,9 @@ if ok
                 %im3=imo( abs(centers(m,2)*resizeFactor-radius(m,1)*resizeFactor):abs(centers(m,2)*resizeFactor+radius(m,1)*resizeFactor),abs(centers(m,1)*resizeFactor-radius(m,1)*resizeFactor):abs(centers(m,1)*resizeFactor+radius(m,1)*resizeFactor));
                 im3 = imcrop(imo,[floor(centers(m,1)*resizeFactor-radius(m,1)*resizeFactor) floor(centers(m,2)*resizeFactor-radius(m,1)*resizeFactor) radius(m,1)*resizeFactor*2   radius(m,1)*resizeFactor*2]);
                 
-              %  figure;
-              %  imshow(im3);
-              %  title("Image cropper");
+                %figure;
+               % imshow(im3);
+               % title("Image cropper");
             catch ME
                 break;
             end
@@ -124,7 +124,7 @@ if ok
                     impan = imread(sprintf('PICTO/%d.png',elem));
                     [centerspan,radiuspan] = imfindcircles(impan,[20 120],'ObjectPolarity','dark', ... 
                     'Sensitivity',0.92,'EdgeThreshold',0.082); 
-                    impan2 = imcrop(impan,[floor(centerspan(1,1)-radiuspan(1,1)) floor(centerspan(1,2)-radiuspan(1,1)) radiuspan(1,1)*2   radius(1,1)*2]);
+                    impan2 = imcrop(impan,[floor(centerspan(1,1)-radiuspan(1,1)) floor(centerspan(1,2)-radiuspan(1,1)) radiuspan(1,1)*2   radiuspan(1,1)*2]);
                     impan=impan(floor(centerspan(1,2)-radiuspan(1)):floor(centerspan(1,2)+radiuspan(1)),floor(centerspan(1,1)-radiuspan(1)):floor(centerspan(1,1)+radiuspan(1)));
                    % impan=rgb2gray(impan);
                    
@@ -173,7 +173,7 @@ if ok
             
             disp("la valeur max pour cette image est : "+maxssimval+ "pour la ligne   "+ indexssimval+ " ");
             
-            if maxssimval> 3
+            if maxssimval> 2.5
                     
                     maLignetrouve = [n floor(resizeFactor*centers(m,2)-resizeFactor*radius(m)) floor(resizeFactor*centers(m,2)+resizeFactor*radius(m)) floor(resizeFactor*centers(m,1)-resizeFactor*radius(m)) floor(resizeFactor*centers(m,1)+resizeFactor*radius(m)) indexssimval];
                     BD = [BD;maLignetrouve];
