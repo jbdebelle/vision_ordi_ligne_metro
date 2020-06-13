@@ -85,7 +85,7 @@ end
 
     % Definir le facteur de redimensionnement
     resizeFactor = 2;
-    % Ici on definit la matrice
+    % Ici on definit la matrice qui contient les resultats
     BD= [];
     % Programme de reconnaissance des images
     for n = numImages
@@ -93,7 +93,8 @@ end
         disp("On traite image "+n+"");
         imo = imread(sprintf('BD/IM (%d).jpg',n));
         
-        %compresse le nb de pixel pour trouver les cercles plus rapidement 
+        %compresse le nb de pixel pour trouver les cercles plus rapidement
+        % on resize avec un facteur de 2
         [rows, columns, numColorChannels] = size(imo);
         numOutputRows = round(rows/resizeFactor);
         numOutputColumns = round(columns/resizeFactor);
@@ -102,23 +103,37 @@ end
         %segmentation -- trouver les cercles avec imfindcircles --%
        [centers,radius] = imfindcircles(im,[11 80],'ObjectPolarity','dark', ... 
             'Sensitivity',0.818,'EdgeThreshold',0.07);
-        pic= [01 02 03 04 05 06 07 08 09 10 11 12 13 14];
-        im = rgb2gray(im);
         
+        % c'est une liste qu'on utilise pour iterer sur toutes les images
+        % de la base PICTO
+        pic= [01 02 03 04 05 06 07 08 09 10 11 12 13 14];
+        im = rgb2gray(im); % on converti l'image rgb en grayscale
+        
+        % c'est une boucle qui parcourt tout les cercles qu'on a trouver
+        % avec la fonction imfindcircles
         for m = 1: length(radius)
-            maLignetrouve = [];
+            maLignetrouve = []; % On initialise une matrice vide qui contiendra les informations de la ligne de metro 
+            % Ici nous avons fait un try catch pour les cas ou le cercle
+            % trouvé dépasse du bord de l'image. Si le cercle est contenu dans l'image on fait les 
+            % traitement autrement on passe au cercle suivant
             try
+              % on initialise une nouvelle image carré qui contient seulement le
+              % cercle a partir de l'image resize en Noir et Blanc
               im2=im( floor(centers(m,2)-radius(m,1)):floor(centers(m,2)+radius(m,1)),floor(centers(m,1)-radius(m,1)):floor(centers(m,1)+radius(m,1)));  
+              % on initialise une nouvelle image carré qui contient seulement le
+              % cercle a partir de l'image original en couleur
               im3 = imcrop(imo,[floor(centers(m,1)*resizeFactor-radius(m,1)*resizeFactor) floor(centers(m,2)*resizeFactor-radius(m,1)*resizeFactor) radius(m,1)*resizeFactor*2   radius(m,1)*resizeFactor*2]);
             catch ME
                 break;
             end
+            
+            % on passe le cercle en binaire 
             level = graythresh(im2);
             BW = imbinarize(im2,level);
             
             coefficientdesmilitudecombiner=[];  % ici on ajoutera simitude et correlation
-            matricedesimilitude = [];
-            matricecorrelation =[];
+            matricedesimilitude = []; % matrice qui contient les coefficients de similitude
+            matricecorrelation =[]; % matrice qui contient les coefficients de correlation
             
             for elem = pic
                 %on recupere les images des symboles des lignes de metro 
@@ -126,7 +141,8 @@ end
                 impan2= matimpan2{elem};
                 BWpan = matBWpan{elem};
                     
-                
+                % on resize l'image du cercle trouver avec la taille du
+                % symbole de la base de données pour pouvoir les comparer
                 [ROWS, COLS, map]=size(impan2);
                 im3 = imresize(im3, [ROWS COLS]);
                 BW = double(imresize(BW,size(BWpan)));
@@ -154,9 +170,8 @@ end
             coefficientdesmilitudecombiner= matricecorrelation + matricedesimilitude;
             % On prend le max pour être sur d'avoir la bonne ligne de métro
             [maxssimval,indexssimval]= max(coefficientdesmilitudecombiner);
-            disp("la valeur max pour cette image est : "+maxssimval+ " pour la ligne "+ indexssimval+ " ");
-            
-            if maxssimval> 2.3
+             
+            if maxssimval> 2.3 % c'est le seuil choisi apres plusieurs test d'optimasation des resultats
                     %On créer la ligne avec les résultat pour ensuite
                     %l'ajouter dans la matrice BD
                     maLignetrouve = [n floor(resizeFactor*centers(m,2)-resizeFactor*radius(m)) floor(resizeFactor*centers(m,2)+resizeFactor*radius(m)) floor(resizeFactor*centers(m,1)-resizeFactor*radius(m)) floor(resizeFactor*centers(m,1)+resizeFactor*radius(m)) indexssimval];
