@@ -32,7 +32,7 @@ end
 
 
 if ok
-    % Definir le facteur de redimensionnement
+    
 
 % Ici, nous allons cree un cell contenant les 14 images correspondant au
 % differentes version des symboles de lignes de metro que nous avons besoin 
@@ -54,7 +54,7 @@ for elem = pic
         impan2 = imcrop(impan,[floor(centerspan(1,1)-radiuspan(1,1)) floor(centerspan(1,2)-radiuspan(1,1)) radiuspan(1,1)*2 radiuspan(1,1)*2]);
         matimpan2=[matimpan2;impan2 ]; % on ajoute le nouveaux symbole de metro a la cell
         impan=impan(floor(centerspan(1,2)-radiuspan(1)):floor(centerspan(1,2)+radiuspan(1)),floor(centerspan(1,1)-radiuspan(1)):floor(centerspan(1,1)+radiuspan(1)));
-        matimpan=[matimpan;impan ];
+       
         
         % passage des images en format binaire
         level = graythresh(impan);
@@ -72,7 +72,7 @@ for elem = pic
         impan2 = imcrop(impan,[floor(centerspan(1,1)-radiuspan(1,1)) floor(centerspan(1,2)-radiuspan(1,1)) radiuspan(1,1)*2   radiuspan(1,1)*2]);
         matimpan2=[matimpan2;impan2 ];
         impan=impan(floor(centerspan(1,2)-radiuspan(1)):floor(centerspan(1,2)+radiuspan(1)),floor(centerspan(1,1)-radiuspan(1)):floor(centerspan(1,1)+radiuspan(1)));
-        matimpan=[matimpan;impan ];
+        
 
         level = graythresh(impan);
         if elem==13
@@ -82,8 +82,10 @@ for elem = pic
         matBWpan=[matBWpan;BWpan ];
     end
 end
-    
+
+    % Definir le facteur de redimensionnement
     resizeFactor = 2;
+    % Ici on definit la matrice
     BD= [];
     % Programme de reconnaissance des images
     for n = numImages
