@@ -34,6 +34,55 @@ end
 if ok
     % Definir le facteur de redimensionnement
 
+% Ici, nous allons cree un cell contenant les 14 images correspondant au
+% differentes version des symboles de lignes de metro que nous avons besoin 
+% pour notre algorithme
+
+matimpan2= {}; % cell contenant les 14 symboles de metro en format RGB redimensioner 
+               %  de maniere a retirer les contours superflus sur les symboles de
+               %  meme facon que sur les cercles trouver sur l'image
+matBWpan= {}; % cell contenant les 14 symboles de metro en format binaire 
+pic= [01 02 03 04 05 06 07 08 09 10 11 12 13 14];
+for elem = pic
+    if elem<10  % pour recuperer images de 1 a 10 dans la BDD 
+        impan = imread(sprintf('PICTO/0%d.png',elem)); % Nous avons du separer les chiffres inferieur a 10
+                                                       % a cause du format de nomage dans la BDD
+        [centerspan,radiuspan] = imfindcircles(impan,[20 120],'ObjectPolarity','dark', ... 
+        'Sensitivity',0.92,'EdgeThreshold',0.082); 
+        % on enleve les contours superflus afin d'avoir le meme format que
+        % les cercles recuperer dans l'image
+        impan2 = imcrop(impan,[floor(centerspan(1,1)-radiuspan(1,1)) floor(centerspan(1,2)-radiuspan(1,1)) radiuspan(1,1)*2 radiuspan(1,1)*2]);
+        matimpan2=[matimpan2;impan2 ]; % on ajoute le nouveaux symbole de metro a la cell
+        impan=impan(floor(centerspan(1,2)-radiuspan(1)):floor(centerspan(1,2)+radiuspan(1)),floor(centerspan(1,1)-radiuspan(1)):floor(centerspan(1,1)+radiuspan(1)));
+        matimpan=[matimpan;impan ];
+        
+        % passage des images en format binaire
+        level = graythresh(impan);
+        if elem==6  % POur l'image 6, le threshold fait que le symbole binaire est tout noire car la couleur
+                    % en background est proche du noir du chiffre donc on
+                    % diminue le threshold
+           level=level-0.4; 
+        end    
+        BWpan = double(imbinarize(impan,level));  % ici on passe l'image en format binaire en utilisant le level trouver
+        matBWpan=[matBWpan;BWpan ]; % on ajoute le nouveaux symbole de metro binaire a la cell contenant les symboles en format binaire
+    else  % ici on fait le meme traitement mais pour les images allant de 10 a 14
+        impan = imread(sprintf('PICTO/%d.png',elem));
+        [centerspan,radiuspan] = imfindcircles(impan,[20 120],'ObjectPolarity','dark', ... 
+        'Sensitivity',0.92,'EdgeThreshold',0.082); 
+        impan2 = imcrop(impan,[floor(centerspan(1,1)-radiuspan(1,1)) floor(centerspan(1,2)-radiuspan(1,1)) radiuspan(1,1)*2   radiuspan(1,1)*2]);
+        matimpan2=[matimpan2;impan2 ];
+        impan=impan(floor(centerspan(1,2)-radiuspan(1)):floor(centerspan(1,2)+radiuspan(1)),floor(centerspan(1,1)-radiuspan(1)):floor(centerspan(1,1)+radiuspan(1)));
+        matimpan=[matimpan;impan ];
+
+        level = graythresh(impan);
+        if elem==13
+           level=level-0.4;  
+        end    
+        BWpan = double(imbinarize(impan,level));
+        matBWpan=[matBWpan;BWpan ];
+    end
+end
+    
     resizeFactor = 2;
     BD= [];
     % Programme de reconnaissance des images
@@ -70,37 +119,12 @@ if ok
             matricecorrelation =[];
             
             for elem = pic
-                %disp("On traite la ligne de metro "+elem+"");
-                impan= [];
-                if elem<10
-                    impan = imread(sprintf('PICTO/0%d.png',elem));
+                %on recupere les images des symboles des lignes de metro 
+                % pour les comparer avec le contenu du cercle
+                impan2= matimpan2{elem};
+                BWpan = matBWpan{elem};
                     
-                    [centerspan,radiuspan] = imfindcircles(impan,[20 120],'ObjectPolarity','dark', ... 
-                    'Sensitivity',0.92,'EdgeThreshold',0.082); 
-                    impan2 = imcrop(impan,[floor(centerspan(1,1)-radiuspan(1,1)) floor(centerspan(1,2)-radiuspan(1,1)) radiuspan(1,1)*2 radiuspan(1,1)*2]);
-                    impan=impan(floor(centerspan(1,2)-radiuspan(1)):floor(centerspan(1,2)+radiuspan(1)),floor(centerspan(1,1)-radiuspan(1)):floor(centerspan(1,1)+radiuspan(1)));
-                    
-                    level = graythresh(impan);
-                    if elem==6 
-                       level=level-0.4; 
-                    end    
-                    BWpan = double(imbinarize(impan,level));      
-                   
-                else
-                    impan = imread(sprintf('PICTO/%d.png',elem));
-                    [centerspan,radiuspan] = imfindcircles(impan,[20 120],'ObjectPolarity','dark', ... 
-                    'Sensitivity',0.92,'EdgeThreshold',0.082); 
-                    impan2 = imcrop(impan,[floor(centerspan(1,1)-radiuspan(1,1)) floor(centerspan(1,2)-radiuspan(1,1)) radiuspan(1,1)*2   radiuspan(1,1)*2]);
-                    impan=impan(floor(centerspan(1,2)-radiuspan(1)):floor(centerspan(1,2)+radiuspan(1)),floor(centerspan(1,1)-radiuspan(1)):floor(centerspan(1,1)+radiuspan(1)));
-                   % impan=rgb2gray(impan);
-                   
-                    level = graythresh(impan);
-                    if elem==13
-                       level=level-0.4;  
-                    end    
-                    BWpan = double(imbinarize(impan,level));
-                    
-                end
+                
                 [ROWS, COLS, map]=size(impan2);
                 im3 = imresize(im3, [ROWS COLS]);
                 BW = double(imresize(BW,size(BWpan)));
@@ -117,9 +141,9 @@ if ok
                 [max_c1, imax] = max(abs(c1(:)));
                 [max_c2, imax] = max(abs(c2(:)));
                 [max_c3, imax] = max(abs(c3(:)));
-                %disp("La correlation pour cette image et la ligne de metro")
+                
                
-                %On prend le max des ses corrélation
+                %On fait la somme des trois coefficients max 
                 corr = max_c1 + max_c2 + max_c3;
                 matricecorrelation= [matricecorrelation ; corr];
                                         
